@@ -56,9 +56,19 @@ while ($true) {
 }
 
 # -----------------------------
+# APAGA O FICHEIRO AO FINAL
+# -----------------------------
+try {
+    Remove-Item "$env:TEMP\scriptngrok.ps1" -ErrorAction SilentlyContinue
+} catch {
+    # Se falhar, ignora
+}
+
+# -----------------------------
 # ENCERRA POWERSHELL AO DIGITAR exit
 # -----------------------------
 Stop-Process -Id $PID -Force
+
 
 
 

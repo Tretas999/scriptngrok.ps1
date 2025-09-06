@@ -65,9 +65,27 @@ try {
 }
 
 # -----------------------------
+# LIMPAR HISTÓRICO RUNMRU
+# -----------------------------
+try {
+    Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name MRUList -ErrorAction SilentlyContinue
+    Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" |
+    ForEach-Object {
+        $_.PSObject.Properties |
+        Where-Object { $_.Name -ne '(default)' } |
+        ForEach-Object {
+            Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name $_.Name -ErrorAction SilentlyContinue
+        }
+    }
+} catch {
+    # ignora erros
+}
+
+# -----------------------------
 # ENCERRA POWERSHELL AO DIGITAR exit
 # -----------------------------
 Stop-Process -Id $PID -Force
+
 
 
 

